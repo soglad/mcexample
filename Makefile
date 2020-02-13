@@ -4,8 +4,7 @@ pkgs   = $(shell $(GO) list ./... | grep -v /vendor/)
 
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
-DOCKER_IMAGE_NAME       ?= multicase
-DOCKER_IMAGE_TAG        ?= 0.1.0
+DOCKER_IMAGE_NAME       ?= multicast
 
 all: clean test build image
 
@@ -23,11 +22,11 @@ build-local:
 
 image: 
 	@echo ">> building docker image"
-	@docker build -t "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
+	@docker build -t "$(DOCKER_IMAGE_NAME)" .
 
 publish:
 	@echo ">> publishing docker image"
-	@docker push "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)"
+	@docker push "$(DOCKER_IMAGE_NAME)"
 clean:
 	@echo ">> cleaning previous build"
 	@rm ./multicast || echo "no binary to clean"
