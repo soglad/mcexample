@@ -1,6 +1,6 @@
 # Multicast Example in Golang
 
-This is an example of doing multicast with golang. This repo is created as I need a multicast implementation to do some POC of multicast usage in in our K8S deployment. The binary can be run directly or within docker. 
+This is an example of doing multicast with golang. This repo is created as I need a multicast implementation to do some POC of multicast usage in K8S deployment. The binary can be run directly or within docker. 
 
 ## Install
 
