@@ -16,7 +16,7 @@ For other method to build and install the binary, please check the Makefile.
 
 ## Usage
 
-The binary can be stared as a server or a receiver. By default, it's started as receiver. And you can make it's stared as server with flag `-s`. If it's not specified, both receriver and server is started and join multicast group 239.0.0.1:12345. You can choose to specify your own group address by flag `-g`. For other usage, you can start and binary with `-h` flag for detail.
+The binary can be started as a server or a receiver. By default, it's started as receiver. With flag `-s`, it's started as server. If it's not specified, both receriver and server is started in multicast group 239.0.0.1:12345. You can choose to specify your own group address by flag `-g`. For other usage, you can start the binary with `-h` flag for detail.
 
 Start receiver as docker container:
 
