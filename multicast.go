@@ -13,6 +13,8 @@ var (
 	isServer bool
 	h        bool
 	group    string
+	iterface string
+	locAddr  string
 )
 
 const (
@@ -23,17 +25,26 @@ func init() {
 	flag.BoolVar(&h, "h", false, "This usage.")
 	flag.BoolVar(&isServer, "s", false, "Start as server. Without this option, it's started as receiver.")
 	flag.StringVar(&group, "g", "239.0.0.1:12345", "Address of multicast group.")
+	flag.StringVar(&iterface, "i", "", "Interface name to listen multicast on.")
+	flag.StringVar(&locAddr, "l", "", "Local address to send datagram.")
 }
 
-//Receive joins a multicast group to receive datagrams.
-func Receive(mgroup string) {
-	log.Printf("Start to join multicast group: %s\n", mgroup)
-	addr, err := net.ResolveUDPAddr("udp4", mgroup)
+//receive joins a multicast group to receive datagrams.
+func receive() {
+	log.Printf("Start to join multicast group: %s\n", group)
+	addr, err := net.ResolveUDPAddr("udp", group)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	con, err := net.ListenMulticastUDP("udp4", nil, addr)
+	var i *net.Interface
+	if len(iterface) > 0 {
+		i, err = net.InterfaceByName(iterface)
+		i.MulticastAddrs()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	con, err := net.ListenMulticastUDP("udp", i, addr)
 	if err != nil {
 		log.Fatal("Failed to jion multicase group!", err)
 	}
@@ -51,23 +62,31 @@ func Receive(mgroup string) {
 	}
 }
 
-//Send creates a server to broadcast in multicast group.
-func Send(mgroup string) {
-	log.Printf("Start server in multicast group:%s\n", mgroup)
-	addr, err := net.ResolveUDPAddr("udp4", mgroup)
+//send creates a server to broadcast in multicast group.
+func send() {
+	log.Printf("Start server in multicast group:%s\n", group)
+	addr, err := net.ResolveUDPAddr("udp", group)
 	if err != nil {
-		log.Fatal("Failed to start !", err)
+		log.Fatal("Failed to resolve udp address !", err)
+	}
+	var laddr *net.UDPAddr
+	if len(locAddr) > 0 {
+		laddr, err = net.ResolveUDPAddr("udp", locAddr)
+		if err != nil {
+			log.Fatal("Failed to resolve udp address !", err)
+		}
 	}
 
-	conn, err := net.DialUDP("udp4", nil, addr)
+	conn, err := net.DialUDP("udp", laddr, addr)
 	if err != nil {
 		log.Fatal("Failed to start !", err)
 	}
 
 	for {
+		time.Sleep(time.Second)
+		log.Println("Send hello message from ", conn.LocalAddr())
 		conn.Write([]byte("hello, world\n"))
-		log.Println("Send hello message.")
-		time.Sleep(1 * time.Second)
+
 	}
 }
 
@@ -87,8 +106,10 @@ func main() {
 	}
 
 	if isServer {
-		Send(group)
+		send()
 	} else {
-		Receive(group)
+		receive()
 	}
+
 }
+
